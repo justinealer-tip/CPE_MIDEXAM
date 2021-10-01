@@ -1,0 +1,343 @@
+---
+  - name: install and configure elasticsearch
+    hosts: elasticsearch
+
+    tasks:
+    - name: Include variables from config.yaml
+      include_vars:
+        file: config.yaml
+
+    - name: Install elasticsearch dependencies java
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: default-jre
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Elasticsearch dependencies nginx
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: nginx
+        service: "nginx"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install elasticsearch with role
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+        repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+        package: elasticsearch
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian' 
+
+
+    - name: Stop Firewall
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian' 
+
+
+    - name: Configure Elasticsearch
+      include_role:
+        name: configelasticsearch
+
+
+  - name: Install and Configure Kibana
+    hosts: kibana
+
+    tasks:
+    - name: Include variables from config.yaml
+      include_vars:
+        file: config.yaml
+
+    - name: Install Kibana dependencies Java
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: default-jre
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Kibana dependencies Nginx
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: nginx
+        service: "nginx"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install kibana
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+        repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+        package: kibana
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian' 
+
+
+    - name: Stop firewall for installing kibana
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian' 
+
+
+    - name: configure kibana
+      include_role:
+        name: configkibana
+
+
+  - name: install and config the kibana
+    hosts: logstash
+
+    tasks:
+    - name: Include variables from config.yaml
+      include_vars:
+        file: config.yaml
+
+    - name: Install Logstash dependencies java
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: default-jre
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Logstash dependencies nginx
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: nginx
+        service: "nginx"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Logstash
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+        repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+        package: logstash
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian' 
+
+
+    - name: Stop Firewall to install kibana
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian' 
+
+    - name: Configure Logstash
+      include_role:
+        name: configlogstash
+
+        
+  - name: Install and configure Nagios
+    hosts: nagios
+
+    tasks:
+    - name: Include variables from config.yaml
+      include_vars:
+        file: config.yaml
+
+    - name: Install Nagios dependencies
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package:
+          - autoconf
+          - gcc
+          - libc6
+          - make
+          - wget
+          - libssl-dev
+          - gawk
+          - dc
+          - build-essential
+          - snmp
+          - libnet-snmp-perl
+          - gettext
+          - unzip
+          - apache2
+          - php
+          - libapache2-mod-php7.4
+          - libgd-dev
+          - python3
+          - python3-pip
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+    - name: configure nagios
+      include_role:
+        name: confignagiosubuntu
+      when: ansible_facts['os_family'] == 'Debian'
+    
+
+
+  - name: Install Grafana
+    hosts: grafana
+
+    tasks:
+    - name: Install Grafana
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: "https://packages.grafana.com/gpg.key"
+        repo: "deb https://packages.grafana.com/oss/deb stable main"
+        package: "grafana"
+        service: "grafana-server"
+      when: ansible_facts['os_family'] == 'Debian'
+    
+    - name: Stop Firewall
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+
+  - name: Install Telegraf
+    hosts: influxdb
+
+    tasks:
+    - name: Install Telegraf dependencies
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: gnupg2
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Telegraf dependencies
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: software-properties-common
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian' 
+
+    - name: Install InfluxDB
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: "https://repos.influxdata.com/influxdb.key"
+        repo: "deb https://repos.influxdata.com/ubuntu bionic stable"
+        package: influxdb
+        service: influxdb
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install Telegraf
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: telegraf
+        service: telegraf
+      when: ansible_facts['os_family'] == 'Debian'
+    
+    - name: Stop Firewall to install teleraf
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+
+  - name: Install Prometheus
+    hosts: prometheus
+
+    tasks:
+    - name: Install Prometheus
+      include_role:
+        name: installprometheus
+      vars:
+        src: prometheus.service
+      when: ansible_facts['os_family'] == 'Debian'
+    
+    - name: Stop Firewall to install prometheus
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian'
+
+    
+
+  - name: Install and configure HTTPD
+    hosts: webserver
+
+    tasks:
+    
+    - name: Include config.yaml variables
+      include_vars:
+        file: config.yaml
+
+    - name: Install Apache
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package:
+          - apache2
+          - php
+          - libapache2-mod-php
+          - php-mysql
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+    - name: Configure Apache2
+      include_role:
+        name: configapache
+      when: ansible_facts['os_family'] == 'Debian'
+  
+
+  - name: Install MariaDB
+    hosts: dbserver
+
+    tasks:
+    - name: Install MariaDB 
+      include_role:
+        name: installpackageubuntu
+      vars:
+        url: ""
+        repo: ""
+        package: mariadb-server
+        service: ""
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+    - name: Stop te firewall
+      include_role:
+        name: stopfirewallubuntu
+      when: ansible_facts['os_family'] == 'Debian'
+
+
+    - name: Start MariaDB
+      include_role:
+        name: mariadb
+      when: ansible_facts['os_family'] == 'Debian'
+    
+
+
